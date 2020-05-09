@@ -1,4 +1,4 @@
-const { XdccClient, XdccEvents } = require('irc-xdcc-2')
+const {XdccClient, XdccEvents} = require('irc-xdcc-2');
 
 async function main() {
     // load irc-xdcc module
@@ -29,16 +29,26 @@ async function main() {
         const client = await XdccClient.create(ircOptions);
         console.log('Connected');
 
-        client.on(XdccEvents.ircPm, (nick, to, text, message) => {
-            console.log('ircPm');
-        })
+        client.on(XdccEvents.ircPm, ircPmHandler);
 
-        await client.addTransfer({ botNick: 'Cookie_', packId: '10604'})
-        client.on(XdccEvents.xdccProgressed, (transfer) => { console.log(transfer) })
-        client.on(XdccEvents.xdccError, (error) => { console.log(error) })
     } catch (e) {
         console.log(e);
     }
+}
+
+/**
+ * @param {string} nick Nickname of sender
+ * @param {string} text Message received
+ * @param {XdccMessage} message Message object received
+ */
+async function ircPmHandler(nick, text, message) {
+    console.log('ircPm');
+    console.log(nick);
+    console.log(text);
+    console.log(message);
+    // await client.addTransfer({ botNick: 'Cookie_', packId: '10604'})
+    // client.on(XdccEvents.xdccProgressed, (transfer) => { console.log(transfer) })
+    // client.on(XdccEvents.xdccError, (error) => { console.log(error) })
 }
 
 main();
