@@ -1,4 +1,5 @@
 const {XdccClient, XdccEvents} = require('irc-xdcc-2');
+const hbjs = require('handbrake-js')
 const express = require('express');
 const app = express();
 
@@ -35,14 +36,40 @@ app.get('/', async (req, res) => {
 
 app.post('/xdcc', async (req, res) => {
     console.log(req.body);
-    const aneem = {
+    const xdccItem = {
         "botNick": req.body.botNick,
         "packId": req.body.packId
     };
-    grabXdcc(aneem);
-    res.json(aneem);
+    grabXdcc(xdccItem);
+    res.json(xdccItem);
     
 });
+
+app.post('/transcode', async (req, res) => {
+    const { file } = req.body;
+    console.log(req.body);
+
+    const hbjsOptions = { 
+        input: `./unprocessed/${file}`, 
+        output: `./processed/${file}.mp4` ,
+        format: `av_mp4`,
+        optimize: true,
+        vb: 50,
+        height: 100
+    };
+
+    hbjs.spawn(hbjsOptions)
+        .on('error', err => {console.log(err)})
+        .on('progress', progress => {
+            console.log(
+                'Percent complete: %s, ETA: %s',
+                progress.percentComplete,
+                progress.eta
+            )
+        })
+
+    res.json(hbjsOptions);
+})
 app.listen(3000);
 
 async function grabXdcc({botNick, packId}) {
