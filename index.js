@@ -21,7 +21,7 @@ const ircOptions = {
     , destPath: './unprocessed'
     , resume: false
     , acceptUnpooled: true
-    , closeConnectionOnCompleted: false
+    , closeConnectionOnCompleted: true
 };
 
 app.use(express.json());
@@ -45,38 +45,9 @@ app.post('/xdcc', async (req, res) => {
 });
 app.listen(3000);
 
-async function main() {
-    try {
-        const client = await XdccClient.create(ircOptions);
-        console.log('Connected');
-
-        client.on(XdccEvents.ircPm, ircPmHandler);
-
-    } catch (e) {
-        console.log(e);
-    }
-}
-
 async function grabXdcc({botNick, packId}) {
     const client = await XdccClient.create(ircOptions);
     await client.addTransfer({ botNick: botNick, packId: packId})
     client.on(XdccEvents.xdccProgressed, (transfer) => { console.log(transfer.progress) })
     client.on(XdccEvents.xdccError, (error) => { console.log(error) })
 }
-
-/**
- * @param {string} nick Nickname of sender
- * @param {string} text Message received
- * @param {XdccMessage} message Message object received
- */
-async function ircPmHandler(nick, text, message) {
-    console.log('ircPm');
-    console.log(nick);
-    console.log(text);
-    console.log(message);
-    // await client.addTransfer({ botNick: 'Cookie_', packId: '10604'})
-    // client.on(XdccEvents.xdccProgressed, (transfer) => { console.log(transfer) })
-    // client.on(XdccEvents.xdccError, (error) => { console.log(error) })
-}
-
-// main();
