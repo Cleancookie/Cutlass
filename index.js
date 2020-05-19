@@ -1,8 +1,6 @@
 const {XdccClient, XdccEvents} = require('irc-xdcc-2');
-const app = require('express')();
-const { TwingEnvironment, TwingLoaderFilesystem } = require('twing');
-let loader = new TwingLoaderFilesystem('./views');
-let twing = new TwingEnvironment(loader);
+const express = require('express');
+const app = express();
 
 const ircOptions = {
     server: 'irc.rizon.net'
@@ -26,13 +24,24 @@ const ircOptions = {
     , closeConnectionOnCompleted: false
 };
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.get('/', async (req, res) => {
-    try {
-        const view = await twing.render('homepage.twig');
-        res.end(view);
-    } catch (e) {
-        console.log(e);
-    }
+    res.json({
+        'message': 'hello'
+    });
+});
+
+app.post('/xdcc', async (req, res) => {
+    console.log(req.body);
+    const aneem = {
+        "botNick": req.body.botNick,
+        "packId": req.body.packId
+    };
+    grabXdcc(aneem);
+    res.json(aneem);
+    
 });
 app.listen(3000);
 
@@ -46,6 +55,13 @@ async function main() {
     } catch (e) {
         console.log(e);
     }
+}
+
+async function grabXdcc({botNick, packId}) {
+    const client = await XdccClient.create(ircOptions);
+    await client.addTransfer({ botNick: botNick, packId: packId})
+    client.on(XdccEvents.xdccProgressed, (transfer) => { console.log(transfer.progress) })
+    client.on(XdccEvents.xdccError, (error) => { console.log(error) })
 }
 
 /**
