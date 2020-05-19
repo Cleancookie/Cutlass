@@ -54,19 +54,14 @@ app.post('/transcode', async (req, res) => {
         output: `./processed/${file}.mp4` ,
         format: `av_mp4`,
         optimize: true,
-        vb: 50,
-        height: 100
+        turbo: true,
+        vb: 5,
+        height: 5
     };
 
-    hbjs.spawn(hbjsOptions)
-        .on('error', err => {console.log(err)})
-        .on('progress', progress => {
-            console.log(
-                'Percent complete: %s, ETA: %s',
-                progress.percentComplete,
-                progress.eta
-            )
-        })
+    const transcoder = hbjs.spawn(hbjsOptions);
+    transcoder.on('error', err => {console.log(err)})
+    transcoder.on('progress', progress => {console.log(`Percent complete: ${progress.percentComplete}, ETA: ${progress.eta}`)});
 
     res.json(hbjsOptions);
 })
