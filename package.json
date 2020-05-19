@@ -1,29 +1,14 @@
 {
   "name": "Cutlass",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "engines" : { "node" : ">=12.0.0" },
-  "scripts": {
-    "start": "node_modules/.bin/nodemon -e js --exec \"npm run serve\"",
-    "serve": "node index",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "api"
+    ]
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Cleancookie/Cutlass.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Cleancookie/Cutlass/issues"
-  },
-  "homepage": "https://github.com/Cleancookie/Cutlass#readme",
-  "dependencies": {
-    "express": "^4.17.1",
-    "handbrake-js": "^5.0.0",
-    "irc-xdcc-2": "^1.0.10",
-    "nodemon": "^2.0.3"
+  "engines": { 
+    "node": ">=12.0.0",
+    "yarn": ">=1.12.0"
   }
 }
