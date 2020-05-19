@@ -1,6 +1,8 @@
 const {XdccClient, XdccEvents} = require('irc-xdcc-2');
 const hbjs = require('handbrake-js')
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const app = express();
 
 const ircOptions = {
@@ -34,8 +36,21 @@ app.get('/', async (req, res) => {
     });
 });
 
+// List unprocessed vids
+app.get('/unprocessed', async (req, res) => {
+    const fullPath = path.join(__dirname, 'unprocessed');
+    let folder = fs.readdirSync(fullPath);
+
+    // Get rid of hidden files
+    folder = folder.filter(fileName => {
+        return !fileName.startsWith('.');
+    });
+
+    res.json(folder);
+});
+
+// Download XDCC
 app.post('/xdcc', async (req, res) => {
-    console.log(req.body);
     const xdccItem = {
         "botNick": req.body.botNick,
         "packId": req.body.packId
@@ -45,6 +60,7 @@ app.post('/xdcc', async (req, res) => {
     
 });
 
+// Transcode video to low quality
 app.post('/transcode', async (req, res) => {
     const { file } = req.body;
     console.log(req.body);
