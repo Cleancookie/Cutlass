@@ -24,30 +24,12 @@ const ircOptions = {
     , closeConnectionOnCompleted: true
 };
 
-module.exports.getListing = async (req, res) => {
-    const fullPath = path.join(__dirname, '..' ,'unprocessed');
-    let folder = fs.readdirSync(fullPath);
-
-    // Get rid of hidden files
-    folder = folder.filter(fileName => {
-        return !fileName.startsWith('.');
-    });
-
-    res.json(folder);
-}
-
-module.exports.download = async (req, res) => {
-    const xdccItem = {
-        "botNick": req.body.botNick,
-        "packId": req.body.packId
-    };
-    grabXdcc(xdccItem);
-    res.json(xdccItem);
-}
-
-async function grabXdcc({botNick, packId}) {
+module.exports.download = async (botNick, packId) => {
     const client = await XdccClient.create(ircOptions);
-    await client.addTransfer({ botNick: botNick, packId: packId})
-    client.on(XdccEvents.xdccProgressed, (transfer) => { console.log(transfer.progress) })
+    await client.addTransfer({ botNick: botNick, packId: packId })
+    client.on(XdccEvents.xdccProgressed, (transfer) => { console.log(`Downloading ${transfer.fileName} - (${transfer.progress})`) })
     client.on(XdccEvents.xdccError, (error) => { console.log(error) })
+    client.on(XdccEvents.xdccCompleted, (transfer) => { console.log(`Completed ${transfer.fileName}`) })
+
+    return { botNick: botNick, packId: packId };
 }

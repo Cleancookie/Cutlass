@@ -2,12 +2,10 @@ const hbjs = require('handbrake-js');
 const path = require('path');
 const fs = require('fs');
 
-module.exports.transcodeVideo = async (req, res) => {
-    const { file } = req.body;
-
-    const hbjsOptions = { 
-        input: path.resolve(__dirname, '..', 'unprocessed', file), 
-        output: path.resolve(__dirname, '..', 'processed', `${file}.mp4`) ,
+module.exports.transcodeVideo = async (fileName) => {
+    const options = { 
+        input: path.resolve(__dirname, '..', 'unprocessed', fileName), 
+        output: path.resolve(__dirname, '..', 'processed', `${fileName}.mp4`) ,
         format: `av_mp4`,
         optimize: true,
         turbo: true,
@@ -15,14 +13,15 @@ module.exports.transcodeVideo = async (req, res) => {
         height: 5
     };
 
-    const transcoder = hbjs.spawn(hbjsOptions);
+    const transcoder = hbjs.spawn(options);
     transcoder.on('error', err => {console.log(err)})
-    transcoder.on('progress', progress => {console.log(`Percent complete: ${progress.percentComplete}, ETA: ${progress.eta}`)});
+    transcoder.on('progress', progress => { console.log(`Percent complete: ${progress.percentComplete}, ETA: ${progress.eta}`) });
+    transcoder.on('complete', () => {console.log(`Transcode Complete}`)});
 
-    res.json(hbjsOptions);
+    return options;
 }
 
-module.exports.getListing = async (req, res) => {
+module.exports.getProcessed = async () => {
     const fullPath = path.join(__dirname, '..' ,'processed');
     let folder = fs.readdirSync(fullPath);
 
@@ -31,5 +30,17 @@ module.exports.getListing = async (req, res) => {
         return !fileName.startsWith('.');
     });
 
-    res.json(folder);
+    return folder;
+}
+
+module.exports.getUnprocessed = async () => {
+    const fullPath = path.join(__dirname, '..', 'unprocessed');
+    let folder = fs.readdirSync(fullPath);
+
+    // Get rid of hidden files
+    folder = folder.filter(fileName => {
+        return !fileName.startsWith('.');
+    });
+
+    return folder;
 }
