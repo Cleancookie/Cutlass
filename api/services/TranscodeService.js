@@ -7,11 +7,14 @@ module.exports.transcodeVideo = async (fileName) => {
     const options = { 
         input: path.resolve(__dirname, '..', 'unprocessed', fileName), 
         output: path.resolve(__dirname, '..', 'processed', `${fileName}.mp4`) ,
+
         format: `av_mp4`,
+        encoder: `x264`,
         optimize: true,
-        turbo: true,
         vb: 400,
-        height: 480
+        height: 480,
+        
+        aencoder: "copy",
     };
 
     const transcoder = hbjs.spawn(options);
